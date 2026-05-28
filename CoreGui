@@ -1,45 +1,64 @@
--- EXTREME STABLE FARM - NO UI BUGS
-_G.FarmActive = false
+-- STABLE TWEEN FARM - CUSTOM WAYPOINTS
+local _G_FarmActive = false
+
+-- สร้าง UI
+local ScreenGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.Size = UDim2.new(0, 220, 0, 140)
+MainFrame.Position = UDim2.new(0.5, -110, 0.4, 0)
+MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true
+
+local Title = Instance.new("TextLabel", MainFrame)
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Text = "★ PRECISE FARM HUB ★"
+Title.TextColor3 = Color3.fromRGB(0, 255, 255)
+Title.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+Title.TextSize = 14
+
+local FarmBtn = Instance.new("TextButton", MainFrame)
+FarmBtn.Size = UDim2.new(0.8, 0, 0, 40)
+FarmBtn.Position = UDim2.new(0.1, 0, 0.5, -20)
+FarmBtn.Text = "START FARM"
+FarmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+FarmBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
 
 local TweenService = game:GetService("TweenService")
 local LocalPlayer = game:GetService("Players").LocalPlayer
 
--- ฟังก์ชันฟาร์มที่เขียนใหม่ให้กระชับและไม่ค้าง
-local function StartFarm()
-    local Points = {Vector3.new(0, 0, -200), Vector3.new(0, 0, -1000), Vector3.new(0, 0, -9000)}
-    while _G.FarmActive do
-        local Char = LocalPlayer.Character
-        local Root = Char and Char:FindFirstChild("HumanoidRootPart")
+local function RunFarm()
+    -- พิกัดที่พี่ให้มา
+    local Waypoints = {
+        Vector3.new(-66, 56, 1372),
+        Vector3.new(-65, 15, 8798),
+        Vector3.new(-53, -355, 9492)
+    }
+    
+    while _G_FarmActive do
+        local Root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
         if Root then
-            for _, pos in pairs(Points) do
-                if not _G.FarmActive then break end
-                local Tween = TweenService:Create(Root, TweenInfo.new(5, Enum.EasingStyle.Linear), {CFrame = CFrame.new(pos)})
-                Tween:Play()
-                Tween.Completed:Wait()
+            for _, pos in pairs(Waypoints) do
+                if not _G_FarmActive then break end
+                
+                -- คำนวณความเร็ว (ยิ่งไกล ยิ่งใช้เวลาเยอะ จะได้ไม่โดนเตะ)
+                local distance = (Root.Position - pos).Magnitude
+                local travelTime = distance / 50 -- ปรับเลข 50 ให้ช้าลงได้ ถ้ายังโดนเตะ
+                
+                local tween = TweenService:Create(Root, TweenInfo.new(travelTime, Enum.EasingStyle.Linear), {CFrame = CFrame.new(pos)})
+                tween:Play()
+                tween.Completed:Wait()
             end
-            task.wait(1)
-            if Char:FindFirstChild("Humanoid") then Char.Humanoid.Health = 0 end
             task.wait(2)
         end
-        task.wait(0.5)
+        task.wait(1)
     end
 end
 
--- สร้าง UI แบบง่ายที่สุดเพื่อกันบั๊ก "กดไม่ได้"
-local ScreenGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
-local Frame = Instance.new("Frame", ScreenGui)
-Frame.Size = UDim2.new(0, 200, 0, 100)
-Frame.Position = UDim2.new(0.5, -100, 0.5, -50)
-Frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-
-local Button = Instance.new("TextButton", Frame)
-Button.Size = UDim2.new(1, 0, 1, 0)
-Button.Text = "START FARMING"
-Button.TextColor3 = Color3.fromRGB(0, 255, 255)
-Button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-
-Button.MouseButton1Click:Connect(function()
-    _G.FarmActive = not _G.FarmActive
-    Button.Text = _G.FarmActive and "STOP FARMING" or "START FARMING"
-    if _G.FarmActive then task.spawn(StartFarm) end
+FarmBtn.MouseButton1Click:Connect(function()
+    _G_FarmActive = not _G_FarmActive
+    FarmBtn.Text = _G_FarmActive and "STOP FARMING" or "START FARM"
+    FarmBtn.BackgroundColor3 = _G_FarmActive and Color3.fromRGB(255, 50, 50) or Color3.fromRGB(0, 150, 255)
+    if _G_FarmActive then task.spawn(RunFarm) end
 end)
