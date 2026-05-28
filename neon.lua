@@ -1,22 +1,27 @@
 _G.AutoFarmActive = false
 
--- ใช้ Library สีขาว-ฟ้า-นีออน
+-- ใช้ Library ตัวเดิม แต่ปรับการตั้งค่าสีใหม่
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/Library.lua"))()
-local Window = Library:CreateWindow({Title = "★ NEON BLUE HUB ★", Center = true, AutoShow = true})
+
+local Window = Library:CreateWindow({
+    Title = "★ NEON SKY HUB ★",
+    Center = true, 
+    AutoShow = true,
+    Size = UDim2.fromOffset(400, 250) -- ปรับให้เล็กลงอีกนิดเพื่อความกะทัดรัด
+})
 
 local MainTab = Window:AddTab("FARMING")
-local MainBox = MainTab:AddLeftGroupbox("Auto Farm Settings")
+local MainBox = MainTab:AddLeftGroupbox("Settings")
 
--- ปรับสีเป็น ขาว-ฟ้านีออน
-Library:SetTheme("Midnight") 
-Library.AccentColor = Color3.fromRGB(0, 255, 255)
+-- ปรับให้โทนสีเป็น "ขาวอมฟ้า" (Light/Sky Blue Theme)
+Library:SetTheme("Light") 
+Library.AccentColor = Color3.fromRGB(135, 206, 250) -- สีฟ้าสว่าง (Light Sky Blue)
 
 local TweenService = game:GetService("TweenService")
 local LocalPlayer = game:GetService("Players").LocalPlayer
 
 local function StartPremiumFarm()
     local Points = {Vector3.new(0, 0, -200), Vector3.new(0, 0, -1000), Vector3.new(0, 0, -9000)}
-    
     while _G.AutoFarmActive do
         local Root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
         if Root then
@@ -34,8 +39,7 @@ local function StartPremiumFarm()
     end
 end
 
-MainBox:AddToggle("FarmToggle", {Text = "START NEON FARM", Callback = function(s)
+MainBox:AddToggle("FarmToggle", {Text = "START FARM", Callback = function(s)
     _G.AutoFarmActive = s
     if s then task.spawn(StartPremiumFarm) end
 end})
-
