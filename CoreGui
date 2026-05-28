@@ -1,4 +1,4 @@
--- STABLE FARM - HIGH SPEED & WATER PROOF
+-- STABLE FARM - SPEED SET TO 80
 local _G_FarmActive = false
 
 -- สร้าง UI
@@ -11,14 +11,14 @@ MainFrame.Draggable = true
 
 local Title = Instance.new("TextLabel", MainFrame)
 Title.Size = UDim2.new(1, 0, 0, 30)
-Title.Text = "★ SPEEDY FARM HUB ★"
+Title.Text = "★ SPEED 80 FARM HUB ★"
 Title.TextColor3 = Color3.fromRGB(0, 255, 255)
 Title.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 
 local FarmBtn = Instance.new("TextButton", MainFrame)
 FarmBtn.Size = UDim2.new(0.8, 0, 0, 40)
 FarmBtn.Position = UDim2.new(0.1, 0, 0.5, -20)
-FarmBtn.Text = "START FAST FARM"
+FarmBtn.Text = "START SPEED 80"
 FarmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 FarmBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
 
@@ -29,10 +29,9 @@ local LocalPlayer = Players.LocalPlayer
 -- ระบบกันน้ำ (Water Proof)
 local function PreventWaterDamage()
     task.spawn(function()
-        while true do
-            task.wait(0.5)
+        while _G_FarmActive do
+            task.wait(0.3)
             if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-                -- ถ้าแตะน้ำ ให้ลอยตัวขึ้น (ป้องกันการโดนดาเมจจากน้ำ)
                 if LocalPlayer.Character.Humanoid:GetState() == Enum.HumanoidStateType.Swimming then
                     LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Physics)
                 end
@@ -54,9 +53,9 @@ local function RunFarm()
             for _, pos in pairs(Waypoints) do
                 if not _G_FarmActive then break end
                 
-                -- ปรับความเร็วตรงนี้ (เลข 25 คือเร็วขึ้น ถ้าโดนเตะให้เพิ่มเลขนี้)
+                -- ปรับความเร็วเป็น 80 (ตัวหารคือ 80)
                 local dist = (Root.Position - pos).Magnitude
-                local tween = TweenService:Create(Root, TweenInfo.new(dist / 25, Enum.EasingStyle.Linear), {CFrame = CFrame.new(pos)})
+                local tween = TweenService:Create(Root, TweenInfo.new(dist / 80, Enum.EasingStyle.Linear), {CFrame = CFrame.new(pos)})
                 tween:Play()
                 tween.Completed:Wait()
             end
@@ -68,10 +67,10 @@ end
 
 FarmBtn.MouseButton1Click:Connect(function()
     _G_FarmActive = not _G_FarmActive
-    FarmBtn.Text = _G_FarmActive and "STOP FARMING" or "START FAST FARM"
+    FarmBtn.Text = _G_FarmActive and "STOP FARMING" or "START SPEED 80"
     FarmBtn.BackgroundColor3 = _G_FarmActive and Color3.fromRGB(255, 50, 50) or Color3.fromRGB(0, 150, 255)
     if _G_FarmActive then 
         task.spawn(RunFarm)
-        PreventWaterDamage() -- เริ่มระบบกันน้ำทันทีที่กดฟาร์ม
+        PreventWaterDamage()
     end
 end)
