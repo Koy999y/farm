@@ -1,75 +1,57 @@
 _G.AutoFarmActive = false
-_G.FlySpeed = 85
 
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-local colors = {
-    SchemeColor = Color3.fromRGB(255, 0, 50),
-    Background = Color3.fromRGB(15, 15, 20),
-    Header = Color3.fromRGB(10, 10, 12),
-    TextColor = Color3.fromRGB(255, 255, 255),
-    ElementColor = Color3.fromRGB(25, 25, 30)
-}
-
-local Window = Library.CreateLib("★ PREMIUM CYBER HUB v4 ★", colors)
+local Window = Library.CreateLib("★ PREMIUM CYBER HUB v7 (RAINBOW) ★", "BloodTheme")
 
 local MainTab = Window:NewTab("FARMING")
-local MainSection = MainTab:NewSection("Main Functions")
+local MainSection = MainTab:NewSection("Auto Farm Options")
 
-local SettingTab = Window:NewTab("SETTINGS")
-local SettingSection = SettingTab:NewSection("Speed Control")
+-- ฟังก์ชันไฟรุ้งวิ่งรอบกรอบเมนู
+task.spawn(function()
+    while true do
+        for i = 0, 1, 0.005 do
+            Window:ChangePresetColor(Color3.fromHSV(i, 1, 1))
+            task.wait(0.05)
+        end
+    end
+end)
 
 local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
 local function StartPremiumFarm()
-    local TargetPosition = Vector3.new(0, -15, -9000) 
+    local Waypoints = {
+        Vector3.new(0, 0, 0),
+        Vector3.new(0, 0, -200),
+        Vector3.new(0, 0, -1000),
+        Vector3.new(0, 0, -3000),
+        Vector3.new(0, 0, -5000),
+        Vector3.new(0, 0, -9000)
+    }
 
     while _G.AutoFarmActive do
-        local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-        local RootPart = Character:WaitForChild("HumanoidRootPart", 10)
-        local Humanoid = Character:WaitForChild("Humanoid", 10)
-
-        if RootPart and Humanoid then
-            Humanoid:ChangeState(Enum.HumanoidStateType.Physics)
-            
-            local CurrentPosition = RootPart.Position
-            local Distance = (CurrentPosition - TargetPosition).Magnitude
-            local TweenTime = Distance / _G.FlySpeed
-
-            local Info = TweenInfo.new(TweenTime, Enum.EasingStyle.Linear)
-            local Tween = TweenService:Create(RootPart, Info, {CFrame = CFrame.new(TargetPosition)})
-            
-            Tween:Play()
-
-            while Tween.PlaybackState == Enum.PlaybackState.Playing do
-                if not _G.AutoFarmActive then
-                    Tween:Cancel()
-                    break
-                end
-                task.wait(0.2)
+        local Character = LocalPlayer.Character
+        local RootPart = Character and Character:FindFirstChild("HumanoidRootPart")
+        
+        if RootPart then
+            for _, pos in pairs(Waypoints) do
+                if not _G.AutoFarmActive then break end
+                local Distance = (RootPart.Position - pos).Magnitude
+                local Tween = TweenService:Create(RootPart, TweenInfo.new(Distance / 150, Enum.EasingStyle.Linear), {CFrame = CFrame.new(pos)})
+                Tween:Play()
+                Tween.Completed:Wait()
             end
-
-            if _G.AutoFarmActive then
-                task.wait(7.5)
-                if Character and Humanoid then
-                    Humanoid.Health = 0
-                end
-                task.wait(3)
-            end
+            task.wait(2)
+            if LocalPlayer.Character:FindFirstChild("Humanoid") then LocalPlayer.Character.Humanoid.Health = 0 end
+            task.wait(3)
         else
             task.wait(1)
         end
     end
 end
 
-MainSection:NewToggle("SYSTEM: AUTO FARM", "Start -> End -> GoldenChest", function(state)
+MainSection:NewToggle("START AUTO FARM", "ฟาร์มรุ้งตึงๆ", function(state)
     _G.AutoFarmActive = state
-    if state then
-        task.spawn(StartPremiumFarm)
-    end
-end)
-
-SettingSection:NewSlider("BOOST SPEED", "Default is 85", 400, 50, function(value)
-    _G.FlySpeed = value
+    if state then task.spawn(StartPremiumFarm) end
 end)
