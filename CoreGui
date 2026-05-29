@@ -1,24 +1,42 @@
+-- FULL FEATURED NEON HUB
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/Library.lua"))()
+local Window = Library:CreateWindow({Title = "★ PREMIUM MARU HUB ★", Center = true, AutoShow = true, Size = UDim2.fromOffset(500, 350)})
 
--- ตั้งค่าธีมให้เป็นโทนเข้มทันสมัย (Dark Mode)
-local Window = Library:CreateWindow({
-    Title = "MARU STYLE HUB",
-    Center = true,
-    AutoShow = true,
-    Size = UDim2.fromOffset(500, 350)
-})
+-- การตั้งค่าขอบไฟรุ้ง (Rainbow Border)
+local ThemeManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/addons/ThemeManager.lua"))()
+Library.KeybindFrame.Visible = true
 
--- สร้าง Tabs (เมนูด้านข้าง) เหมือนในรูป
+-- Tabs
 local MainTab = Window:AddTab("Main")
-local WaveTab = Window:AddTab("Wave")
+local FarmTab = Window:AddTab("Farming")
 
--- เพิ่มส่วนประกอบในหน้า Main
+-- หน้า Main (ฟังก์ชันปรับแต่ง)
 local MainBox = MainTab:AddLeftGroupbox("Settings")
 MainBox:AddSlider("FlyHeight", {Text = "Fly Height", Min = 0, Max = 500, Default = 235})
-MainBox:AddSlider("SafeTime", {Text = "Safe Time Finish", Min = 0, Max = 60, Default = 27})
-MainBox:AddInput("StreakLimit", {Text = "Streak Limit", Default = ""})
-MainBox:AddToggle("AutoDie", {Text = "Auto Die When Streak Reached", Default = false})
+MainBox:AddToggle("WaterProof", {Text = "Anti Water Damage", Default = true})
 
--- ปรับแต่งสีให้เหมือนรูป
-Library:SetTheme("DarkTheme")
-Library.AccentColor = Color3.fromRGB(0, 150, 255) -- สีฟ้าสว่าง
+-- หน้า Farming (ระบบฟาร์ม)
+local FarmBox = FarmTab:AddLeftGroupbox("Auto Farm")
+FarmBox:AddToggle("FarmToggle", {Text = "ACTIVE FARMING", Default = false, Callback = function(s)
+    _G.AutoFarmActive = s
+    if s then task.spawn(function()
+        local TweenService = game:GetService("TweenService")
+        local Root = game:GetService("Players").LocalPlayer.Character.HumanoidRootPart
+        local Points = {Vector3.new(-66, 56, 1372), Vector3.new(-65, 15, 8798), Vector3.new(-53, -355, 9492)}
+        while _G.AutoFarmActive do
+            for _, pos in pairs(Points) do
+                if not _G.AutoFarmActive then break end
+                local tween = TweenService:Create(Root, TweenInfo.new(50, Enum.EasingStyle.Linear), {CFrame = CFrame.new(pos)})
+                tween:Play()
+                tween.Completed:Wait()
+            end
+        end
+    end) end
+end})
+
+-- ปรับแต่งธีมให้สวย (Dark + Blue + Rainbow)
+Library:SetTheme("Midnight")
+Library.AccentColor = Color3.fromRGB(0, 150, 255)
+ThemeManager:SetLibrary(Library)
+ThemeManager:ApplyToGroupbox(MainBox)
+ThemeManager:ApplyToGroupbox(FarmBox)
